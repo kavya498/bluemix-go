@@ -38,17 +38,6 @@ const (
 )
 
 var regionToEndpoint = map[string]map[string]string{
-	"account": {
-		"global": "https://accounts.cloud.ibm.com",
-	},
-	"certificate-manager": {
-		"us-south": "https://us-south.certificate-manager.cloud.ibm.com",
-		"us-east":  "https://us-east.certificate-manager.cloud.ibm.com",
-		"eu-gb":    "https://eu-gb.certificate-manager.cloud.ibm.com",
-		"au-syd":   "https://au-syd.certificate-manager.cloud.ibm.com",
-		"eu-de":    "https://eu-de.certificate-manager.cloud.ibm.com",
-		"jp-tok":   "https://jp-tok.certificate-manager.cloud.ibm.com",
-	},
 	"cf": {
 		"us-south": "https://api.ng.bluemix.net",
 		"us-east":  "https://api.us-east.bluemix.net",
@@ -58,58 +47,13 @@ var regionToEndpoint = map[string]map[string]string{
 		"jp-tok":   "https://api.jp-tok.bluemix.net",
 	},
 	"cr": {
-		"us-south": "https://us.icr.io",
-		"eu-de":    "https://de.icr.io",
-		"au-syd":   "https://au.icr.io",
-		"eu-gb":    "https://uk.icr.io",
-		"jp-tok":   "https://jp.icr.io",
-		"jp-osa":   "https://jp2.icr.io",
-	},
-	"cs": {
-		"global": "https://containers.cloud.ibm.com/global",
-	},
-	"cis": {
-		"global": "https://api.cis.cloud.ibm.com",
-	},
-	"global-search": {
-		"global": "https://api.global-search-tagging.cloud.ibm.com",
-	},
-	"global-tagging": {
-		"global": "https://tags.global-search-tagging.cloud.ibm.com",
-	},
-	"iam": {
-		"global": "https://iam.cloud.ibm.com",
-	},
-	"iampap": {
-		"global": "https://iam.cloud.ibm.com",
-	},
-	"icd": {
-		"us-south": "https://api.us-south.databases.cloud.ibm.com",
-		"us-east":  "https://api.us-east.databases.cloud.ibm.com",
-		"eu-de":    "https://api.eu-de.databases.cloud.ibm.com",
-		"eu-gb":    "https://api.eu-gb.databases.cloud.ibm.com",
-		"au-syd":   "https://api.au-syd.databases.cloud.ibm.com",
-		"jp-tok":   "https://api.jp-tok.databases.cloud.ibm.com",
-		"jp-osa":   "https://api.jp-osa.databases.cloud.ibm.com",
-		"osl01":    "https://api.osl01.databases.cloud.ibm.com",
-		"seo01":    "https://api.seo01.databases.cloud.ibm.com",
-		"che01":    "https://api.che01.databases.cloud.ibm.com",
-	},
-	"mccp": {
-		"us-south": "https://mccp.us-south.cf.cloud.ibm.com",
-		"us-east":  "https://mccp.us-east.cf.cloud.ibm.com",
-		"eu-gb":    "https://mccp.eu-gb.cf.cloud.ibm.com",
-		"au-syd":   "https://mccp.au-syd.cf.cloud.ibm.com",
-		"eu-de":    "https://mccp.eu-de.cf.cloud.ibm.com",
-	},
-	"resource-manager": {
-		"global": "https://resource-controller.cloud.ibm.com",
-	},
-	"resource-catalog": {
-		"global": "https://globalcatalog.cloud.ibm.com",
-	},
-	"resource-controller": {
-		"global": "https://resource-controller.cloud.ibm.com",
+		"us-south": "us.icr.io",
+		"us-east":  "us.icr.io",
+		"eu-de":    "de.icr.io",
+		"au-syd":   "au.icr.io",
+		"eu-gb":    "uk.icr.io",
+		"jp-tok":   "jp.icr.io",
+		"jp-osa":   "jp2.icr.io",
 	},
 	"uaa": {
 		"us-south": "https://iam.cloud.ibm.com/cloudfoundry/login/us-south",
@@ -118,31 +62,8 @@ var regionToEndpoint = map[string]map[string]string{
 		"au-syd":   "https://iam.cloud.ibm.com/cloudfoundry/login/ap-south",
 		"eu-de":    "https://iam.cloud.ibm.com/cloudfoundry/login/eu-central",
 	},
-	"cse": {
-		"global": "https://api.serviceendpoint.cloud.ibm.com",
-	},
-	"schematics": {
-		"us-south": "https://us.schematics.cloud.ibm.com",
-		"eu-gb":    "https://eu-gb.schematics.cloud.ibm.com",
-		"eu-de":    "https://eu-de.schematics.cloud.ibm.com",
-	},
-	"usermanagement": {
-		"global": "https://user-management.cloud.ibm.com",
-	},
-	"hpcs": {
-		"us-south": "https://us-south.broker.hs-crypto.cloud.ibm.com/crypto_v2/",
-		"us-east":  "https://us-east.broker.hs-crypto.cloud.ibm.com/crypto_v2/",
-		"au-syd":   "https://au-syd.broker.hs-crypto.cloud.ibm.com/crypto_v2/",
-		"eu-de":    "https://eu-de.broker.hs-crypto.cloud.ibm.com/crypto_v2/",
-	},
-	"functions": {
-		"us-south": "https://us-south.functions.cloud.ibm.com",
-		"us-east":  "https://us-east.functions.cloud.ibm.com",
-		"eu-gb":    "https://eu-gb.functions.cloud.ibm.com",
-		"au-syd":   "https://au-syd.functions.cloud.ibm.com",
-		"eu-de":    "https://eu-de.functions.cloud.ibm.com",
-	},
 }
+var privateRegions = []string{"us-south", "us-east"}
 
 func init() {
 	//TODO populate the endpoints which can be retrieved from given endpoints dynamically
@@ -150,12 +71,13 @@ func init() {
 }
 
 type endpointLocator struct {
-	region string
+	region     string
+	visibility string
 }
 
 //NewEndpointLocator ...
-func NewEndpointLocator(region string) EndpointLocator {
-	return &endpointLocator{region: region}
+func NewEndpointLocator(region, visibility string) EndpointLocator {
+	return &endpointLocator{region: region, visibility: visibility}
 }
 
 func (e *endpointLocator) AccountManagementEndpoint() (string, error) {
@@ -163,10 +85,11 @@ func (e *endpointLocator) AccountManagementEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_ACCOUNT_MANAGEMENT_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["account"]["global"]; ok {
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Account Management endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" && (e.region == "us-south" || e.region == "us-east") {
+		return fmt.Sprintf("https://private.%s.accounts.cloud.ibm.com", e.region), nil
+	}
+	return "https://accounts.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) CertificateManagerEndpoint() (string, error) {
@@ -174,10 +97,11 @@ func (e *endpointLocator) CertificateManagerEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_CERTIFICATE_MANAGER_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["certificate-manager"][e.region]; ok {
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Certificate Manager Service endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" {
+		return fmt.Sprintf("https://private.%s.certificate-manager.cloud.ibm.com", e.region), nil
+	}
+	return fmt.Sprintf("https://%s.certificate-manager.cloud.ibm.com", e.region), nil
 }
 
 func (e *endpointLocator) CFAPIEndpoint() (string, error) {
@@ -188,6 +112,9 @@ func (e *endpointLocator) CFAPIEndpoint() (string, error) {
 	} else if ep, ok := regionToEndpoint["cf"][e.region]; ok {
 		return ep, nil
 	}
+	if e.visibility == "private" {
+		return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Private Endpoints is not supported by this service"))
+	}
 	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Cloud Foundry endpoint doesn't exist for region: %q", e.region))
 }
 
@@ -196,10 +123,11 @@ func (e *endpointLocator) ContainerEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_CS_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["cs"]["global"]; ok {
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Container Service endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" {
+		return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Private Endpoints is not supported by this service"))
+	}
+	return "https://containers.cloud.ibm.com/global", nil
 }
 
 func (e *endpointLocator) SchematicsEndpoint() (string, error) {
@@ -207,10 +135,20 @@ func (e *endpointLocator) SchematicsEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_SCHEMATICS_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["schematics"][e.region]; ok {
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Schematics Service endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" {
+		if e.region == "us-south" || e.region == "us-east" {
+			ep := "https://private-us.schematics.cloud.ibm.com"
+			return ep, nil
+		}
+		if e.region == "eu-gb" || e.region == "eu-de" {
+			ep := "https://private-eu.schematics.cloud.ibm.com"
+			return ep, nil
+		}
+		return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Private Endpoints is not supported by this service for the region %s", e.region))
+
+	}
+	return fmt.Sprintf("https://%s.schematics.cloud.ibm.com", e.region), nil
 }
 
 func (e *endpointLocator) ContainerRegistryEndpoint() (string, error) {
@@ -219,20 +157,25 @@ func (e *endpointLocator) ContainerRegistryEndpoint() (string, error) {
 	if endpoint != "" {
 		return endpoint, nil
 	} else if ep, ok := regionToEndpoint["cr"][e.region]; ok {
-		return ep, nil
+		if e.visibility == "private" {
+			return fmt.Sprintf("https://private.%s", ep), nil
+		}
+		return fmt.Sprintf("https://%s", ep), nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Container Registry Service endpoint doesn't exist for region: %q", e.region))
+	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Container Registry endpoint doesn't exist for region: %q", e.region))
 }
 
+// Not used in Provider as we have migrated to go-sdk
 func (e *endpointLocator) CisEndpoint() (string, error) {
 	//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_CIS_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["cis"]["global"]; ok {
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Cis Service endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" {
+		return "https://api.private.cis.cloud.ibm.com", nil
+	}
+	return "https://api.cis.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) GlobalSearchEndpoint() (string, error) {
@@ -240,10 +183,11 @@ func (e *endpointLocator) GlobalSearchEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_GS_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["global-search"]["global"]; ok {
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Global Search Service endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" && (e.region == "us-south" || e.region == "us-east") {
+		return fmt.Sprintf("https://api.private.%s.global-search-tagging.cloud.ibm.com", e.region), nil
+	}
+	return "https://api.global-search-tagging.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) GlobalTaggingEndpoint() (string, error) {
@@ -251,10 +195,11 @@ func (e *endpointLocator) GlobalTaggingEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_GT_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["global-tagging"]["global"]; ok {
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Global Tagging Service endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" && (e.region == "us-south" || e.region == "us-east") {
+		return fmt.Sprintf("https://tags.private.%s.global-search-tagging.cloud.ibm.com", e.region), nil
+	}
+	return "https://tags.global-search-tagging.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) IAMEndpoint() (string, error) {
@@ -262,10 +207,14 @@ func (e *endpointLocator) IAMEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_IAM_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["iam"]["global"]; ok {
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("IAM endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" {
+		if e.region == "us-south" || e.region == "us-east" {
+			return fmt.Sprintf("https://private.%s.iam.cloud.ibm.com", e.region), nil
+		}
+		return "https://private.iam.cloud.ibm.com", nil
+	}
+	return "https://iam.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) IAMPAPEndpoint() (string, error) {
@@ -273,11 +222,14 @@ func (e *endpointLocator) IAMPAPEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_IAMPAP_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["iampap"]["global"]; ok {
-		//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
-		return ep, nil
 	}
-	return "", fmt.Errorf("IAMPAP endpoint doesn't exist for region: %q", e.region)
+	if e.visibility == "private" {
+		if e.region == "us-south" || e.region == "us-east" {
+			return fmt.Sprintf("https://private.%s.iam.cloud.ibm.com", e.region), nil
+		}
+		return "https://private.iam.cloud.ibm.com", nil
+	}
+	return "https://iam.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) ICDEndpoint() (string, error) {
@@ -285,61 +237,66 @@ func (e *endpointLocator) ICDEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_ICD_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["icd"][e.region]; ok {
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("ICD Service endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" {
+		return fmt.Sprintf("https://api.%s.private.databases.cloud.ibm.com", e.region), nil
+	}
+	return fmt.Sprintf("https://api.%s.databases.cloud.ibm.com", e.region), nil
 }
 
 func (e *endpointLocator) MCCPAPIEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_MCCP_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["mccp"][e.region]; ok {
-		//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("MCCP API endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" {
+		return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Private Endpoints is not supported by this service for the region %s", e.region))
+	}
+	return fmt.Sprintf("https://mccp.%s.cf.cloud.ibm.com", e.region), nil
 }
 
 func (e *endpointLocator) ResourceManagementEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_RESOURCE_MANAGEMENT_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["resource-manager"]["global"]; ok {
-		//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Resource Management endpoint doesn't exist"))
+	if e.visibility == "private" && (e.region == "us-south" || e.region == "us-east") {
+		return fmt.Sprintf("https://private.%s.resource-controller.cloud.ibm.com", e.region), nil
+	}
+	return "https://resource-controller.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) ResourceControllerEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_RESOURCE_CONTROLLER_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["resource-controller"]["global"]; ok {
-		//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Resource Controller endpoint doesn't exist"))
+	if e.visibility == "private" && (e.region == "us-south" || e.region == "us-east") {
+		return fmt.Sprintf("https://private.%s.resource-controller.cloud.ibm.com", e.region), nil
+	}
+	return "https://resource-controller.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) ResourceCatalogEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_RESOURCE_CATALOG_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["resource-catalog"]["global"]; ok {
-		//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Resource Catalog endpoint doesn't exist"))
+	if e.visibility == "private" && (e.region == "us-south" || e.region == "us-east") {
+		return fmt.Sprintf("https://private.%s.globalcatalog.cloud.ibm.com", e.region), nil
+	}
+	return "https://globalcatalog.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) UAAEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_UAA_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["uaa"][e.region]; ok {
+	}
+	if e.visibility == "private" {
+		return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Private Endpoints is not supported by this service for the region %s", e.region))
+	}
+	if ep, ok := regionToEndpoint["uaa"][e.region]; ok {
 		//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
 		return ep, nil
 	}
@@ -350,42 +307,39 @@ func (e *endpointLocator) CseEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_CSE_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["cse"]["global"]; ok {
-		//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("CSE endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" {
+		return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Private Endpoints is not supported by this service"))
+	}
+	return "https://api.serviceendpoint.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) UserManagementEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_USER_MANAGEMENT_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["usermanagement"]["global"]; ok {
-		//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("User Management endpoint doesn't exist"))
+	if e.visibility == "private" && (e.region == "us-south" || e.region == "us-east") {
+		return fmt.Sprintf("https://private.%s.user-management.cloud.ibm.com", e.region), nil
+	}
+	return "https://user-management.cloud.ibm.com", nil
 }
 
 func (e *endpointLocator) HpcsEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_HPCS_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["hpcs"][e.region]; ok {
-		//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("HPCS Service endpoint doesn't exist for region: %q", e.region))
+	return fmt.Sprintf("https://%s.broker.hs-crypto.cloud.ibm.com/crypto_v2/", e.region), nil
 }
 
 func (e *endpointLocator) FunctionsEndpoint() (string, error) {
 	endpoint := helpers.EnvFallBack([]string{"IBMCLOUD_FUNCTIONS_API_ENDPOINT"}, "")
 	if endpoint != "" {
 		return endpoint, nil
-	} else if ep, ok := regionToEndpoint["functions"][e.region]; ok {
-		//As the current list of regionToEndpoint above is not exhaustive we allow to read endpoints from the env
-		return ep, nil
 	}
-	return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Namespace Service endpoint doesn't exist for region: %q", e.region))
+	if e.visibility == "private" {
+		return "", bmxerror.New(ErrCodeServiceEndpoint, fmt.Sprintf("Private Endpoints is not supported by this service for the region %s", e.region))
+	}
+	return fmt.Sprintf("https://%s.functions.cloud.ibm.com", e.region), nil
 }
